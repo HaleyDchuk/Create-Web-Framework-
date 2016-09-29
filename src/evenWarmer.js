@@ -4,9 +4,50 @@
 
 module.exports = { 
 	Request: Request,
-	Response: Response, 
+	Response: Response 
+	//toString: toString
 	//setHeader: setHeader
 }
+
+
+// var testObject = {}; 
+// var animals = ['cats', 'dogs', 'monkeys']; 
+// //var animals = []; 
+// //var age = []; 
+// var age = ['3', '4', '5']; 
+// var b; 
+// for(b = 0; b < animals.length; b++){ 
+// 	testObject[animals[b]] = age[b];  
+// }
+// console.log("LENGTH OF ANIMAL THING"); 
+// console.log(Object.keys(testObject).length); 
+// var i; 
+// var printThis = ''; 
+// //console.log("PRINTING NOW"); 
+// for(i = 0; i < Object.keys(testObject).length; i++){ 
+
+// for(i in testObject){ 
+// 	//console.log("THIS IS i"); 
+// 	//console.log(i + ': '); 
+// 	//console.log(testObject[i]); 
+// 	printThis = printThis + i + ': ' + testObject[i] + '\r\n'; 
+
+// 	//console.log(i); 
+// // 	for(key in testObject[i]){
+// // 		console.log(key + ': ' + testObject[i][key]); 
+// // 	} 
+
+// 	}
+// // 	console.log("PRINT THIS"); 
+// // console.log(printThis); 
+// }
+// 	console.log("PRINT THIS"); 
+// console.log(printThis); 
+
+
+
+
+
 
 // var s = ''
 // s += 'GET /foo.html HTTP/1.1\r\n';   // request line
@@ -164,6 +205,7 @@ function Request(s){
 	}
 	this.headers = headers; 
 	this.body = body; 
+
 }
 
 var req = new Request(s); 
@@ -185,7 +227,7 @@ console.log(req.stringKeys);
 console.log('length'); 
 
 
-function toString(req){ 
+Request.prototype.toString = function(){ 
 	var returnString = '';
 	returnString = req.method + ' ' + req.path +' HTTP/1.1\r\n';
 	var x; 
@@ -206,7 +248,7 @@ function toString(req){
 }
 
 console.log("This is toString"); 
-console.log(toString(req)); 
+console.log(req.toString()); 
 
 //the response object 
 
@@ -215,30 +257,59 @@ console.log(toString(req));
 function Response(sock){
 	this.sock = sock;
 	var headers = {};
+	this.headers = headers; 
 	var body = ''; 
-	var statusCode = '';  
+	this.body = body; 
+	var statusCode = '';
+	this.statusCode = statusCode;   
 
-	this.setHeader = function setHeader(name, value){
-		this.headers[name] = value; 
+	var codeObject = {}; 
+	var codes = []; 
+	codes.push(200); 
+	codes.push(404); 
+	codes.push(500); 
+	codes.push(400); 
+	codes.push(301); 
+	codes.push(302); 
+	codes.push(303); 
+
+	var message = []; 
+	message.push('OK');
+	message.push('Not Found');
+	message.push('Internal Server Error');
+	message.push('Bad Request');
+	message.push('Moved Pernamentaly');
+	message.push('Found');
+	message.push('See Other');
+	
+	var q; 
+	for(q = 0; q < codes.length; q++){ 
+		codeObject[codes[q]] = message[q]; 
 	}
+	this.codeObject = codeObject; 
+	// var names = []; 
+	// var vals = []; 
+	// this.names = names; 
+	// this.vals = vals; 
 
 }
+
+
 
 
 
 var net = require('net'); 
 var server = net.createServer(function(sock){
 	sock.on('data', function(data){
+		
+
+			console.log('TO STRING TO STRING'); 
 		//not sure what goes here vvvv
 		var dataString = ''; 
 		dataString = dataString + data; 
 		var req = new Request(dataString); 
 		var res = new Response(sock); 
 
-		// console.log(JSON.stringify(res)); 
-
-		// console.log("SET HEADER"); 
-		// console.log(s.setHeader('Content-Type', 'text/html')); 
 		// console.log(JSON.stringify(res)); 
 
 		var path = req.path; 
@@ -255,13 +326,68 @@ var server = net.createServer(function(sock){
 			sock.end(); 
 		}	
 
+
 })
 	})
 
 
 
-function setHeader(name, value){ 
-		res.prototype.headers[name] = value; 
+Response.prototype.toString = function (){ 
+	var str = ''; 
+	str = str + 'HTTP/1.1 ';  
+	var status = this.statusCode; 
+	var thisValue = this.codeObject[status]; 
+	
+	var numberHeaders = Object.keys(this.headers).length; 
+	if(numberHeaders == 0){ 
+		str = str + status + ' ' + thisValue + '\r\n'; 
+		str += '\r\n'; 
+		return str; 
+	} else { 
+		
+		var i; 
+		var headerString = ''; 
+		for(i = 0; i < Object.keys(this.headers).length; i++){ 
+
+			for(i in this.headers){ 
+				headerString = headerString + i + ': ' + this.headers[i] + '\r\n';
+
+				}
+		}
+
+		str = str + status + ' ' + thisValue + '\r\n'; 
+		str += headerString + '\r\n';
+		var bod = this.body; 
+		str += bod; 
+		return str; 
+		
 	}
+}
+
+Response.prototype.setHeader = function(name, value){ 
+		this.headers[name] = value; 
+		
+	}
+
+//passes can write without ending test 
+//does binary data or string matter??
+Response.prototype.write = function(data){ 
+	var str = ''; 
+	str += data; 
+	this.sock.write(str); 
+}
+
+//do I need the write in there??
+Response.prototype.end = function(s){ 
+	var str = ''; 
+	str += s; 
+	//this.sock.write(str); 
+	this.sock.end(str); 
+}
+
+
+Response.prototype.send = function(statusCode, body){
+	
+}
 
 server.listen(8080, '127.0.0.1'); 
