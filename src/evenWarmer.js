@@ -66,12 +66,12 @@ module.exports = {
      //    s += '\r\n';
      //   s += 'foo=bar&baz=qux';
 
-        var s = 'POST /foo/create HTTP/1.1\r\n';
-        s += 'Host: localhost:8080\r\n';
-        s += 'Referer: localhost:8080/referer.html\r\n';
-        s += '\r\n';
-        s += 'foo=bar&baz=qux';
-
+        // var s = 'POST /foo/create HTTP/1.1\r\n';
+        // s += 'Host: localhost:8080\r\n';
+        // s += 'Referer: localhost:8080/referer.html\r\n';
+        // s += '\r\n';
+        // s += 'foo=bar&baz=qux';
+//var s = ''; 
 // console.log("this is s"); 
 // console.log(s); 
 
@@ -182,12 +182,12 @@ function Request(s){
 	// console.log(spaceSplit[2]); 
 	// console.log(spaceSplit[3]); 
 	var r; 
-	var body = ' '; 
+	var body = ''; 
 	for(r = 0; r < spaceSplit.length; r++){ 
 		var currentElement = spaceSplit[r]; 
 		if(currentElement === ''){ 
 			var currIndex = r; 
-			var bodyBeginning = currentElement; 
+			//var bodyBeginning = currentElement; 
 			// console.log('body'); 
 			// console.log(bodyBeginning); 
 			// console.log(currIndex); 
@@ -196,64 +196,65 @@ function Request(s){
 				// console.log('body'); 
 				// console.log(body); 
 			 }
-			// else { 
-			// 	body = 'hello'; 
-			// 	console.log('body'); 
-			// 	console.log(body); 
+			//  else { 
+			//  	body = ''; 
+			// // 	body = 'hello'; 
+			// // 	console.log('body'); 
+			// // 	console.log(body); 
 			// }
-		}
+		} 
 	}
 	this.headers = headers; 
 	this.body = body; 
 
 }
 
-var req = new Request(s); 
+// var req = new Request(s); 
 
-console.log("path"); 
-console.log(req.path); 
-console.log("method"); 
-console.log(req.method);
-console.log("headers"); 
-console.log(req.headers); 
-console.log("body"); 
-console.log(req.body); 
-console.log("keys"); 
-console.log(req.keys); 
-console.log("keys"); 
-console.log(req.values); 
-console.log("stringKeys"); 
-console.log(req.stringKeys); 
-console.log('length'); 
+// console.log("path"); 
+// console.log(req.path); 
+// console.log("method"); 
+// console.log(req.method);
+// console.log("headers"); 
+// console.log(req.headers); 
+// console.log("body"); 
+// console.log(req.body); 
+// console.log("keys"); 
+// console.log(req.keys); 
+// console.log("keys"); 
+// console.log(req.values); 
+// console.log("stringKeys"); 
+// console.log(req.stringKeys); 
+// console.log('length'); 
 
 
 Request.prototype.toString = function(){ 
 	var returnString = '';
-	returnString = req.method + ' ' + req.path +' HTTP/1.1\r\n';
+	returnString += this.method + ' ' + this.path +' HTTP/1.1\r\n';
 	var x; 
 	var str = ''; 
-	for(x = 0; x < req.stringKeys.length; x++){ 
-		str = str + req.stringKeys[x] + ' ' + req.values[x] +  '\r\n'; 
+	for(x = 0; x < this.stringKeys.length; x++){ 
+		str = str + this.stringKeys[x] + ' ' + this.values[x] +  '\r\n'; 
 	}
 	// console.log("HEADER STRING"); 
 	// console.log(str); 
+	console.log("THIS BODY"); 
+	console.log(this.body); 
+	var thisBody = this.body; 
 	returnString = returnString + str + '\r\n'; 
-	if(req.body === ''){ 
+	if(this.body === ''){ 
 		returnString = returnString + '\r\n'; 
 	} else { 
-		returnString = returnString + req.body; 
+		returnString = returnString + this.body; 
 	}
 	return returnString; 
-	//'\r\n\r\n' + req.body; 
+	
 }
 
-console.log("This is toString"); 
-console.log(req.toString()); 
+// console.log("This is toString"); 
+// console.log(req.toString()); 
 
-//the response object 
-
-
-
+//the response object
 function Response(sock){
 	this.sock = sock;
 	var headers = {};
@@ -278,7 +279,7 @@ function Response(sock){
 	message.push('Not Found');
 	message.push('Internal Server Error');
 	message.push('Bad Request');
-	message.push('Moved Pernamentaly');
+	message.push('Moved Permanently');
 	message.push('Found');
 	message.push('See Other');
 	
@@ -385,9 +386,79 @@ Response.prototype.end = function(s){
 	this.sock.end(str); 
 }
 
-
+//passing the test but I'm not sure if im doing this right 
 Response.prototype.send = function(statusCode, body){
-	
+	this.statusCode = statusCode; 
+	this.body = body; 
+	this.end(); 
 }
 
+Response.prototype.writeHead = function (statusCode){
+	this.statusCode = statusCode; 
+	//does write have to have arguments passed to it? 
+	this.write(); 
+}
+
+Response.prototype.redirect = function(statusCode, url){
+	var size = arguments.length; 
+	// console.log('SIZE SIZE SIZE ');
+	// console.log(size);  
+	var getMessage = ''; 
+	var str = ''; 
+	var newVal = '';
+	
+	if(size == 2){ 
+		getMessage = this.codeObject[statusCode]; 
+		this.statusCode = statusCode; 
+		// console.log("STATUS CODE"); 
+		// console.log(statusCode); 
+		str += 'HTTP/1.1 ' + this.statusCode + ' ' + getMessage + '\r\n'; 
+		 
+		newVal += url; 
+		this.headers['Location'] = newVal; 
+		str += 'Location: ' + newVal + '\r\n'; 
+		console.log("ENDING STRING"); 
+		console.log(str); 
+		this.end(str); 
+} else { 
+	var status = 301; 
+	// var getMessage = ''; 
+	// var str = ''; 
+	getMessage = this.codeObject[status]; 
+	this.statusCode = status; 
+	// console.log("STATUS CODE"); 
+	// console.log(status); 
+	str += 'HTTP/1.1 ' + status + ' ' + getMessage + '\r\n'; 
+	//var newVal = ''; 
+	newVal += arguments[0]; 
+	// console.log("WHAT VALUE IS THIS"); 
+	// console.log(newVal); 
+	this.headers['Location'] = newVal; 
+	str += 'Location: ' + newVal + '\r\n'; 
+	console.log("ENDING STRING"); 
+	console.log(str); 
+	this.end(str); 
+}
+
+} 
+
+// Response.prototype.redirect = function(newUrl){
+// 	//this.statusCode = statusCode; 
+// 	var statusCode = 301; 
+// 	var getMessage = ''; 
+// 	var str = ''; 
+// 	getMessage = this.codeObject[statusCode]; 
+// 	this.statusCode = statusCode; 
+// 	console.log("STATUS CODE"); 
+// 	console.log(statusCode); 
+// 	str += 'HTTP/1.1 ' + statusCode + ' ' + getMessage + '\r\n'; 
+// 	var newVal = ''; 
+// 	newVal += newUrl; 
+// 	this.headers['Location'] = newVal; 
+// 	str += 'Location: ' + newVal + '\r\n'; 
+// 	console.log("ENDING STRING"); 
+// 	console.log(str); 
+// 	this.end(str); 
+
+// }
 server.listen(8080, '127.0.0.1'); 
