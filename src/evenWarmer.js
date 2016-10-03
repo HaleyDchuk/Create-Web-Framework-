@@ -5,10 +5,8 @@
 module.exports = { 
 	Request: Request,
 	Response: Response 
-	//toString: toString
-	//setHeader: setHeader
+	
 }
-
 
 
 
@@ -307,19 +305,65 @@ function Response(sock){
 
 
 var net = require('net'); 
+var fs = require('fs'); 
 var server = net.createServer(function(sock){
 	sock.on('data', function(data){
 		
 
-			console.log('TO STRING TO STRING'); 
-		//not sure what goes here vvvv
 		var dataString = ''; 
 		dataString = dataString + data; 
 		var req = new Request(dataString); 
 		var res = new Response(sock); 
+		//CHECKING THE RESPONSE FUNCTIONS 
+		//HOW/WHEN DOES REDIRECT COME INTO PLAY???
+		// res.writeHead DOES NOT WORK 
+		// end and write being weird 
+			res.statusCode = '200'; 
+			console.log('status code'); 
+			console.log(res.statusCode); 
 
-		// console.log(JSON.stringify(res)); 
+			res.setHeader('Content-Type', 'text/html');
+			res.setHeader('something-else', 'text/css'); 
+			console.log('set header'); 
+			console.log(res.headers); 
 
+			console.log('message'); 
+			console.log(res.codeObject[res.statusCode]); 
+
+		var path = req.path; 
+		console.log("path"); 
+		console.log(path); 
+		console.log('writing'); 
+		var g = 'hello'; 
+		//getting undefined 
+		console.log(res.write(g)); 
+
+		res.send(301, 'foo'); 
+		console.log('setting new status code'); 
+		console.log(res.statusCode); 
+		console.log('body'); 
+		console.log(res.body); 
+		//res.write does not work 
+		//res.writeHead('200'); 
+
+		console.log('all to string'); 
+		console.log(res.toString()); 
+
+
+		//OLD VERSION BEFORE CREATED RESPONSE OBJECT 
+		// var path = '/'; 
+		// if(path === '/'){ 
+		// 	res.setHeader('Content-Type', 'text/html'); 
+		// 	// res.statusCode = '200'; 
+		// 	var statusMessage = res.codeObject[res.statusCode]; 
+		// 	//var entireMessage = 'HTTP/1.1 ' + res.statusCode + ' ' + statusMessage + '\r\n' + res.headers + '\r\n\r\n' + '<link rel = "stylesheet" type = "text/css" href = "/foo.css">'; 
+		// 	//res.write(entireMessage); 
+		// 	var mess = 'HTTP/1.1 ' + res.statusCode + ' ' + statusMessage + '\r\n' + res.headers + '\r\n\r\n' + '<h2> hello world </h2>'; 
+		// 	res.write(mess); 
+		// 	res.end(); 
+		// }
+
+		/* 
 		var path = req.path; 
 		//var path = '/'; 
 		if(path === '/'){
@@ -333,6 +377,7 @@ var server = net.createServer(function(sock){
 			sock.write('HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\n page not found  '); 
 			sock.end(); 
 		}	
+		*/ 
 
 
 })
@@ -380,8 +425,9 @@ Response.prototype.setHeader = function(name, value){
 //passes can write without ending test 
 //does binary data or string matter??
 Response.prototype.write = function(data){ 
-	var str = ''; 
+	var str = ""; 
 	str += data; 
+	//this.sock.write(str); 
 	this.sock.write(str); 
 }
 
@@ -449,23 +495,62 @@ Response.prototype.redirect = function(statusCode, url){
 
 } 
 
-// Response.prototype.redirect = function(newUrl){
-// 	//this.statusCode = statusCode; 
-// 	var statusCode = 301; 
-// 	var getMessage = ''; 
-// 	var str = ''; 
-// 	getMessage = this.codeObject[statusCode]; 
-// 	this.statusCode = statusCode; 
-// 	console.log("STATUS CODE"); 
-// 	console.log(statusCode); 
-// 	str += 'HTTP/1.1 ' + statusCode + ' ' + getMessage + '\r\n'; 
-// 	var newVal = ''; 
-// 	newVal += newUrl; 
-// 	this.headers['Location'] = newVal; 
-// 	str += 'Location: ' + newVal + '\r\n'; 
-// 	console.log("ENDING STRING"); 
-// 	console.log(str); 
-// 	this.end(str); 
+Response.prototype.sendFile = function(fileName){ 
+	var publicRoot = __dirname + '/../public'; 
+	var filePath = publicRoot + fileName; 
+	var split = fileName.split('.'); 
+	var extension = split[1];
+	var textBased;  
+	if(extension === 'jpeg' || extension === 'jpg'){ 
+		this.headers['Content-Type'] = 'image/jpeg'; 
+		textBased = false; 
+	} else if (extension === 'png'){ 
+		this.headers['Content-Type'] = 'image/png'; 
+		textBased = false; 
+	} else if (extension === 'gif'){ 
+		this.headers['Content-Type'] = 'image/gif'; 
+		textBased = false; 
+	} else if (extension === 'html'){ 
+		this.headers['Content-Type'] = 'text/html'; 
+		textBas3ed = true;
+	} else if (extension === 'css'){ 
+		this.headers['Content-Type'] = 'text/css'; 
+		textBased = true; 
+	} else { 
+		this.headers['Content-Type'] = 'text/plain'; 
+		textBased = true; 
+	}
+	var contentType; 
+	if(textBased === true){ 
+		contentType = this.headers['Content-Type']; 
+		fs.readFile(this.fileName, {encoding:'utf8'}, this.handleRead.bind(this, contentType)); 
+		
+	} else { 
+		contentType = this.headers['Content-Type']; 
+		fs.readFile(this.fileName, {}, this.handleRead.bind(this, contentType)); 
+	}
 
-// }
+}
+
+Response.prototype.handleRead = function(err, data){ 
+	//how do we know that something went wrong, if there is data in the error object? 
+	if(err.length >= 1){ 
+		var codeMessage = this.codeObject[500]; 
+		this.setHeader('Content-Type', 'text/plain'); 
+		//sets status code and body 
+		this.send(500, 'An error has occured'); 
+		//call to string within write??? 
+		this.write(toString()); 
+		//end 
+		this.end(); 
+	} else { 
+		this.setHeader('Content-Type', this.contentType); 
+		this.writeHead(200); 
+		//dont understand 3 
+		this.write(data); 
+		this.end(); 
+	}
+	
+}
+
 server.listen(8080, '127.0.0.1'); 
