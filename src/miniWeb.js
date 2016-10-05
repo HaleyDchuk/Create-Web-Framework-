@@ -5,31 +5,127 @@
 
 module.exports = { 
 	Request: Request,
-	Response: Response 
+	Response: Response, 
+	App: App
 	
 }
 
+// var fileName = '/test'; 
+// var publicRoot = __dirname + '/../public'; 
+// console.log('directory name'); 
+// console.log(__dirname); 
+// 	var filePath = publicRoot + fileName; 
+// 	console.log('file path'); 
+// 	console.log(filePath); 
+// 	var spl = filePath.split('/'); 
+// 	console.log("splitting"); 
+// 	console.log(spl); 
+
+
+ 
+ 
+
+
+
+// var testObject = {}; 
+// var animals = ['cats', 'dogs', 'monkeys']; 
+// //var animals = []; 
+// //var age = []; 
+// var age = ['3', '4', '5']; 
+// var b; 
+// for(b = 0; b < animals.length; b++){ 
+// 	testObject[animals[b]] = age[b];  
+// }
+// console.log("LENGTH OF ANIMAL THING"); 
+// console.log(Object.keys(testObject).length); 
+// var i; 
+// var printThis = ''; 
+// //console.log("PRINTING NOW"); 
+// for(i = 0; i < Object.keys(testObject).length; i++){ 
+
+// for(i in testObject){ 
+// 	//console.log("THIS IS i"); 
+// 	//console.log(i + ': '); 
+// 	//console.log(testObject[i]); 
+// 	printThis = printThis + i + ': ' + testObject[i] + '\r\n'; 
+
+// 	//console.log(i); 
+// // 	for(key in testObject[i]){
+// // 		console.log(key + ': ' + testObject[i][key]); 
+// // 	} 
+
+// 	}
+// // 	console.log("PRINT THIS"); 
+// // console.log(printThis); 
+// }
+// 	console.log("PRINT THIS"); 
+// console.log(printThis); 
+
+
+
+
+
+
+// var s = ''
+// s += 'GET /foo.html HTTP/1.1\r\n';   // request line
+// s += 'Host: localhost:8080\r\n';     // headers
+// s += '\r\n\r\n'; 
+
+
+   // var s = 'GET /foo.html HTTP/1.1\r\n';
+   //      s += 'Host: localhost:8080\r\n';
+   //      s += 'Referer: http://bar.baz/qux.html\r\n';
+   //      s += '\r\n';
+
+     // var s = 'POST /foo/create HTTP/1.1\r\n';
+     //    s += 'Host: localhost:8080\r\n';
+     //    s += 'Referer: http://bar.baz/qux.html\r\n';
+     //    s += '\r\n';
+     //   s += 'foo=bar&baz=qux';
+
+        // var s = 'POST /foo/create HTTP/1.1\r\n';
+        // s += 'Host: localhost:8080\r\n';
+        // s += 'Referer: localhost:8080/referer.html\r\n';
+        // s += '\r\n';
+        // s += 'foo=bar&baz=qux';
+//var s = ''; 
+// console.log("this is s"); 
+// console.log(s); 
+
 function Request(s){ 
 	var requestParts = s.split(' '); 
+	// console.log("request parts"); 
+	// console.log(requestParts); 
 	var path = requestParts[1]; 
 	this.path = path; 
 	var method = requestParts[0]; 
 	this.method = method; 
-	
+	// console.log(method); 
+	// console.log(path); 
 
 	//THIS IS ALL FOR GETTING THE HEADERS 
 	var gettingHeaders = s.split('\r\n'); 
+	// console.log('gettingHeaders length'); 
+	// console.log(gettingHeaders.length); 
+	//console.log("getting HEADERS"); 
+	//console.log(gettingHeaders[0]); 
 	var x; 
 	var headerArray = []; 
 	for(x = 1; x < gettingHeaders.length-1; x++){ 
 		
 		var currentHeader = gettingHeaders[x]; 
+		//console.log(currentHeader); 
 		if(currentHeader !== ''){
 			headerArray.push(currentHeader); 
 		} else { 
 			break; 
 		}
 	}
+
+	// console.log('header array'); 
+	// console.log(headerArray.length); 
+	// console.log(headerArray[0]); 
+	// console.log(headerArray[1]); 
 
 
 	var keysAndValues = []; 
@@ -46,46 +142,83 @@ function Request(s){
 
 	}
 
+	// console.log("IDK WHAT"); 
+	// console.log(keysAndValues[0]); 
+	// console.log(keysAndValues[1]); 
+	// console.log(keysAndValues[2]); 
+	// console.log(keysAndValues[3]); 
 	var stringKeys = []; 
 	var keys = []; 
 	var t; 
 	for(t = 0; t < keysAndValues.length; t+=2){ 
 		var thisElement = keysAndValues[t]; 
 		stringKeys.push(thisElement); 
+		// console.log('HELL'); 
+		// console.log(stringKeys[0]); 
 		var splitElements = thisElement.split(':'); 
 		keys.push(splitElements[0]); 
 	}
-
+	// console.log('keys length'); 
+	// console.log(keys.length); 
+	// console.log(keys[0]); 
+	// console.log(keys[1]); 
 	this.keys = keys; 
 	this.stringKeys = stringKeys; 
+
+
 	var values = []; 
 	var g; 
 	for(g = 1; g < keysAndValues.length; g+=2){ 
 		var thisValue = keysAndValues[g]; 
 		values.push(thisValue); 
 	}
-
+	// console.log('values length'); 
+	// console.log(values.length); 
+	// console.log(values[0]); 
+	// console.log(values[1]); 
 
 	this.values = values; 
+
 	var f; 
 	var headers = {}; 
 	for(f = 0; f< headerArray.length; f++){ 
 		headers[keys[f]] = values[f]; 
 	}
+	// console.log('headers'); 
+	// console.log(headers); 
+
 
 	//END OF GETTING THE HEADERS 
 
 	//GETTING THE BODY 
 	var spaceSplit = s.split('\r\n'); 
+	// console.log('length'); 
+	// console.log(spaceSplit.length); 
+	// console.log(spaceSplit[0]); 
+	// console.log(spaceSplit[1]); 
+	// console.log(spaceSplit[2]); 
+	// console.log(spaceSplit[3]); 
 	var r; 
 	var body = ''; 
 	for(r = 0; r < spaceSplit.length; r++){ 
 		var currentElement = spaceSplit[r]; 
 		if(currentElement === ''){ 
 			var currIndex = r; 
+			//var bodyBeginning = currentElement; 
+			// console.log('body'); 
+			// console.log(bodyBeginning); 
+			// console.log(currIndex); 
 			if(spaceSplit[currIndex+1] !== ' '){
 				body = spaceSplit[currIndex+1]; 
+				// console.log('body'); 
+				// console.log(body); 
 			 }
+			//  else { 
+			//  	body = ''; 
+			// // 	body = 'hello'; 
+			// // 	console.log('body'); 
+			// // 	console.log(body); 
+			// }
 		} 
 	}
 	this.headers = headers; 
@@ -120,7 +253,8 @@ Request.prototype.toString = function(){
 	for(x = 0; x < this.stringKeys.length; x++){ 
 		str = str + this.stringKeys[x] + ' ' + this.values[x] +  '\r\n'; 
 	}
-
+	// console.log("HEADER STRING"); 
+	// console.log(str); 
 	console.log("THIS BODY"); 
 	console.log(this.body); 
 	var thisBody = this.body; 
@@ -171,8 +305,10 @@ function Response(sock){
 		codeObject[codes[q]] = message[q]; 
 	}
 	this.codeObject = codeObject; 
-
 }
+
+
+
 
 
 var net = require('net'); 
@@ -189,66 +325,87 @@ var server = net.createServer(function(sock){
 		//HOW/WHEN DOES REDIRECT COME INTO PLAY???
 		// res.writeHead DOES NOT WORK 
 		// end and write being weird 
-			res.statusCode = '200'; 
-			console.log('status code'); 
-			console.log(res.statusCode); 
+		// 	res.statusCode = '200'; 
+		// 	console.log('status code'); 
+		// 	console.log(res.statusCode); 
 
-			res.setHeader('Content-Type', 'text/html');
-			res.setHeader('something-else', 'text/css'); 
-			console.log('set header'); 
-			console.log(res.headers); 
+		// 	// res.setHeader('Content-Type', 'text/html');
+		// 	// res.setHeader('something-else', 'text/css'); 
+		// 	// console.log('set header'); 
+		// 	// console.log(res.headers); 
 
-			console.log('message'); 
-			console.log(res.codeObject[res.statusCode]); 
+		// 	console.log('message'); 
+		// 	console.log(res.codeObject[res.statusCode]); 
 
-		var path = req.path; 
-		console.log("path"); 
-		console.log(path); 
-		console.log('writing'); 
-		var g = 'hello'; 
-		//getting undefined 
-		console.log(res.write(g)); 
+		// var path = req.path; 
+		// console.log("path"); 
+		// console.log(path); 
+		// console.log('writing'); 
+		// var g = 'hello'; 
+		// //getting undefined 
+		// //console.log(res.write(g)); 
 
-		res.send(301, 'foo'); 
-		console.log('setting new status code'); 
-		console.log(res.statusCode); 
-		console.log('body'); 
-		console.log(res.body); 
-		//res.write does not work 
-		//res.writeHead('200'); 
-
-		console.log('all to string'); 
-		console.log(res.toString()); 
+		// res.send(301, 'foo'); 
+		// console.log('setting new status code'); 
+		// console.log(res.statusCode); 
+		// console.log('body'); 
+		// console.log(res.body); 
+		
 
 
-		//NEW VERSION AFTER CREATED RESPONSE OBJECT 
-		// var path = '/'; 
+		//NEW NEW VERSION CHECKING SENDFILE 
+		//res.sendFile('/html/test.html'); 
+		//res.sendFile('/img/bmo1.gif'); 
+
+		res.sendFile('/html/test.html'); 
+		res.sendFile('/css/foo.css'); 
+
+
+		//NEW  VERSION AFTER CREATED RESPONSE OBJECT 
+		//var path = '/'; 
+		//var path = '/foo.css'; 
+		//var path = '/img/bmo1.gif'; 
+		
+		// var path = req.path; 
+		// //var path = '/test.html'; 
 		// if(path === '/'){ 
-		// 	res.setHeader('Content-Type', 'text/html'); 
-		// 	// res.statusCode = '200'; 
-		// 	var statusMessage = res.codeObject[res.statusCode]; 
-		// 	//var entireMessage = 'HTTP/1.1 ' + res.statusCode + ' ' + statusMessage + '\r\n' + res.headers + '\r\n\r\n' + '<link rel = "stylesheet" type = "text/css" href = "/foo.css">'; 
-		// 	//res.write(entireMessage); 
-		// 	var mess = 'HTTP/1.1 ' + res.statusCode + ' ' + statusMessage + '\r\n' + res.headers + '\r\n\r\n' + '<h2> hello world </h2>'; 
-		// 	res.write(mess); 
-		// 	res.end(); 
+		// 	res.setHeader('Content-Type', 'text/html');
+		// 	res.send(200, '<em> Hello </em> <strong> World </strong>'); 
+		// 	var allToString = res.toString(); 
+		
+	
+		// } else if( path === '/foo.css'){ 
+		// 	res.setHeader('Content-Type', 'text/css');
+		// 	res.send(200, 'h2 {color: red;}'); 
+
+		// } else if (path === '/test.html'){
+		// 	console.log('WE MADE IT HERE'); 
+		// 	//res.sendFile(path);
+
+		// } else if(path === '/img/bmo1.gif'){
+		// 	//res.sendFile(path); 
+
+		// } else { 
+		// 	res.setHeader('Content-Type', 'text/plain');
+		// 	res.send(404, 'Page Not Found'); 
+		// 	//res.sendFile(path); 
 		// }
 
-		/* OLD VERSION BEFORE CREATED RESPONSE OBJECT 
-		var path = req.path; 
-		//var path = '/'; 
-		if(path === '/'){
-			sock.write('HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n <link rel = "stylesheet" type = "text/css" href = "/foo.css">'); 
-			sock.write(' <h2> This is a red header! </h2>\r\n\r\n <em> Hello </em> <strong> World </strong> '); 
-			sock.end(); 
-		} else if(path === '/foo.css'){
-			sock.write('HTTP/1.1 200 OK\r\nContent-Type: text/css\r\n\r\n h2 {color: red;} '); 
-			sock.end(); 
-		} else{
-			sock.write('HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\n page not found  '); 
-			sock.end(); 
-		}	
-		*/ 
+		 //OLD VERSION BEFORE CREATED RESPONSE OBJECT 
+		// var path = req.path; 
+		// //var path = '/'; 
+		// if(path === '/'){
+		// 	sock.write('HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n <link rel = "stylesheet" type = "text/css" href = "/foo.css">'); 
+		// 	sock.write(' <h2> This is a red header! </h2>\r\n\r\n <em> Hello </em> <strong> World </strong> '); 
+		// 	sock.end(); 
+		// } else if(path === '/foo.css'){
+		// 	sock.write('HTTP/1.1 200 OK\r\nContent-Type: text/css\r\n\r\n h2 {color: red;} '); 
+		// 	sock.end(); 
+		// } else{
+		// 	sock.write('HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\n page not found  '); 
+		// 	sock.end(); 
+		// }	
+		 
 
 
 })
@@ -293,34 +450,27 @@ Response.prototype.setHeader = function(name, value){
 		
 	}
 
-//passes can write without ending test 
-//does binary data or string matter??
 Response.prototype.write = function(data){ 
-	var str = ""; 
-	str += data; 
-	//this.sock.write(str); 
-	this.sock.write(str); 
+	
+		this.sock.write(data); 
+	
 }
 
-//do I need the write in there??
 Response.prototype.end = function(s){ 
-	var str = ''; 
-	str += s; 
-	//this.sock.write(str); 
-	this.sock.end(str); 
+	this.sock.end(s); 
 }
 
 //passing the test but I'm not sure if im doing this right 
 Response.prototype.send = function(statusCode, body){
 	this.statusCode = statusCode; 
 	this.body = body; 
+	this.write(this.toString()); 
 	this.end(); 
 }
 
 Response.prototype.writeHead = function (statusCode){
 	this.statusCode = statusCode; 
-	//does write have to have arguments passed to it? 
-	this.write(); 
+	this.write(this.toString()); 
 }
 
 Response.prototype.redirect = function(statusCode, url){
@@ -368,7 +518,14 @@ Response.prototype.redirect = function(statusCode, url){
 
 Response.prototype.sendFile = function(fileName){ 
 	var publicRoot = __dirname + '/../public'; 
+	//var publicRoot = '/Users/haleydanylchuk/hed248-homework03/public'; 
+	//console.log('directory name'); 
+	// console.log(__dirname); 
+	 console.log('public root '); 
+	 console.log(publicRoot); 
 	var filePath = publicRoot + fileName; 
+	// console.log('file path'); 
+	// console.log(filePath); 
 	var split = fileName.split('.'); 
 	var extension = split[1];
 	var textBased;  
@@ -382,8 +539,12 @@ Response.prototype.sendFile = function(fileName){
 		this.headers['Content-Type'] = 'image/gif'; 
 		textBased = false; 
 	} else if (extension === 'html'){ 
+		console.log("WE MADE IT TO HTML"); 
 		this.headers['Content-Type'] = 'text/html'; 
-		textBas3ed = true;
+		textBased = true;
+		console.log("HEADERS"); 
+		console.log(this.headers); 
+		console.log(textBased); 
 	} else if (extension === 'css'){ 
 		this.headers['Content-Type'] = 'text/css'; 
 		textBased = true; 
@@ -392,26 +553,152 @@ Response.prototype.sendFile = function(fileName){
 		textBased = true; 
 	}
 
+
+
+	var contentType; 
 	if(textBased === true){ 
-		var contentType = this.headers['Content-Type']; 
-		fs.readFile(this.fileName, {encoding:'utf8'}, this.handleRead.bind(this, contentType)); 
+		console.log("WE MADE IT TO TEXT BASED TRUE"); 
+		contentType = this.headers['Content-Type']; 
+		fs.readFile(filePath, {"encoding": "utf8"}, this.handleRead.bind(this, contentType)); 
 		
 	} else { 
-		fs.readFile(this.fileName, {}, this.handleRead.bind(this, contentType)); 
+		console.log("HELLLLLLLLLLLLLLO"); 
+		contentType = this.headers['Content-Type']; 
+		fs.readFile(filePath, {}, this.handleRead.bind(this, contentType)); 
 	}
 
 }
 
-Response.prototype.handleRead = function(err, data){ 
-	this.setHeader('Content-Type', this.contentType); 
-	this.writeHead(200); 
-	//dont understand 3 
-	this.end(); 
+Response.prototype.handleRead = function(contentType, err, data){ 
+	//how do we know that something went wrong, if there is data in the error object? 
+	console.log("THIS IS HTE ERROR"); 
+	console.log(err); 
+	if(err){ 
+		                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    nERROR"); 
+		//var codeMessage = this.codeObject[500]; 
+		this.setHeader('Content-Type', contentType); 
+		//sets status code and body 
+		this.send(500, 'An error has occured!'); 
+		//call to string within write??? 
+		//this.write(toString()); 
+		//end 
+		//this.end(); 
+		//console.log('RESPONSE TO STRING'); 
+		//console.log(res.toString()); 
+	} else { 
+		console.log("NO ERROR"); 
+		this.setHeader('Content-Type', contentType); 
+		this.writeHead(200); 
+		//this.send(200, this.codeObject[200]); 
+		//this.send(200, data); 
+		//dont understand 3 
+		this.write(data); 
+		this.end(); 
+	}
+	
 }
 
 server.listen(8080, '127.0.0.1'); 
 
 
 
-//APP OBJECT 
-function App
+//APP OBJECT represents a web application 
+//it's responsible for accepting incoming http requests
+//holding routes, or url/path combinations 
+//determine what to do based on the incoming request 
+//sending back a response 
+
+//The App object represents both a web server and the web application running on that server 
+function App(){ 
+	//an instance of a Server object 
+	//when you create a server using net.createServer, it expects a callback function 
+	//to be specified when a client connects to the server 
+	//that method will be a method that i define handleConnection 
+	this.server = net.createServer(this.handleConnection.bind(this)); 
+	//an object that maps paths to callback functions 
+	var routes = {}; 
+
+}
+
+var App = require('./miniWeb.js').App; 
+//var app = new App(); 
+
+//get adds path as a property name in routes, the value of which is the callback function cd 
+App.prototype.get = function(path, cb){ 
+	//cb called when path is requested; what to do when a specific path is asked for 
+	this.routes[path] = cb(req, res); 
+	// if(path === '/'){ 
+	// 	this.routes[path] = function(req, res){
+	// 		res.send(200, 'image and stylesheet'); 
+	// 	}; 
+	// } else if(path === '/about'){
+	// 	this.routes[path] = function(req, res){ 
+
+	// 	}
+
+	// }
+
+}
+
+//callback function takes two arguments a Request and Response object 
+// function callBack(req, res){ 
+	
+
+// }
+
+
+//binds the server to the given port and host "listens" on host:port
+//port - the port number to bind to 
+//host - the host the server will be running on 
+App.prototype.listen = function(port, host){ 
+	this.server(port, host); 
+}
+
+
+//function called when a client connects to the server 
+//sets the callback for the socket's on method 
+//this is the callback for net.createServer function 
+//sock - the socket representing the connection to the client
+App.prototype.handleConnection = function(sock){ 
+	//changes handleRequestData to only have one argument, sock? right? 
+	sock.on('data', this.handleRequestData.bind(this, sock)); 
+}
+
+
+//function called when the socket recieves data from the client 
+//assu,es that once it recieves data, the data recieved is the entire request 
+//processes a request and sends back the data 
+App.prototype.handleRequestData = function(sock, binaryData){ 
+	var dataStr = ''; 
+	dataStr += binaryData; 
+	var req = new Request(dataStr); 
+	var res = new Response(sock); 
+	sock.on('close', this.logResponse.bind(this, req, res)); 
+	var pathProperty = this.req.path; 
+	if(pathProperty in this.routes){ 
+		var execute = this.routes[pathProperty]; 
+		execute(req, res); 
+	} else { 
+		send(404, res.codeObject[404]); 
+	}
+
+
+}
+
+//logs out the http request method and path and response status code and short message 
+//req - incoming http request 
+// res - the resulting http response 
+App.prototype.logResponse = function (req, res){ 
+
+	//do not know how to access these variables 
+	var m = this.req.method; 
+	var p = this.req.path; 
+	var c = this.res.statusCode; 
+	var co = codeObject[c]; 
+	console.log('method', m); 
+	console.log('path', p); 
+	console.log('status code', c; 
+	console.log('status code message', co); 
+
+
+}
