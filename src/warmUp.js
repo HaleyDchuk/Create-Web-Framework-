@@ -3,21 +3,14 @@
 
 function Request(s){ 
 	var requestParts = s.split(' '); 
-	// console.log("request parts"); 
-	// console.log(requestParts); 
 	var path = requestParts[1]; 
 	this.path = path; 
 	var method = requestParts[0]; 
 	this.method = method; 
-	// console.log(method); 
-	// console.log(path); 
+	
 
 	//THIS IS ALL FOR GETTING THE HEADERS 
 	var gettingHeaders = s.split('\r\n'); 
-	// console.log('gettingHeaders length'); 
-	// console.log(gettingHeaders.length); 
-	//console.log("getting HEADERS"); 
-	//console.log(gettingHeaders[0]); 
 	var x; 
 	var headerArray = []; 
 	for(x = 1; x < gettingHeaders.length-1; x++){ 
@@ -30,13 +23,6 @@ function Request(s){
 			break; 
 		}
 	}
-
-	// console.log('header array'); 
-	// console.log(headerArray.length); 
-	// console.log(headerArray[0]); 
-	// console.log(headerArray[1]); 
-
-
 	var keysAndValues = []; 
 	var i; 
 	for(i = 0; i < headerArray.length; i ++){ 
@@ -51,41 +37,25 @@ function Request(s){
 
 	}
 
-	// console.log("IDK WHAT"); 
-	// console.log(keysAndValues[0]); 
-	// console.log(keysAndValues[1]); 
-	// console.log(keysAndValues[2]); 
-	// console.log(keysAndValues[3]); 
 	var stringKeys = []; 
 	var keys = []; 
 	var t; 
 	for(t = 0; t < keysAndValues.length; t+=2){ 
 		var thisElement = keysAndValues[t]; 
 		stringKeys.push(thisElement); 
-		// console.log('HELL'); 
-		// console.log(stringKeys[0]); 
 		var splitElements = thisElement.split(':'); 
 		keys.push(splitElements[0]); 
 	}
-	// console.log('keys length'); 
-	// console.log(keys.length); 
-	// console.log(keys[0]); 
-	// console.log(keys[1]); 
+	//key names of header to access them in toString() method 
 	this.keys = keys; 
 	this.stringKeys = stringKeys; 
-
-
 	var values = []; 
 	var g; 
 	for(g = 1; g < keysAndValues.length; g+=2){ 
 		var thisValue = keysAndValues[g]; 
 		values.push(thisValue); 
 	}
-	// console.log('values length'); 
-	// console.log(values.length); 
-	// console.log(values[0]); 
-	// console.log(values[1]); 
-
+	//values of headers to access them in toString() method 
 	this.values = values; 
 
 	var f; 
@@ -93,41 +63,21 @@ function Request(s){
 	for(f = 0; f< headerArray.length; f++){ 
 		headers[keys[f]] = values[f]; 
 	}
-	// console.log('headers'); 
-	// console.log(headers); 
-
-
 	//END OF GETTING THE HEADERS 
 
 	//GETTING THE BODY 
 	var spaceSplit = s.split('\r\n'); 
-	// console.log('length'); 
-	// console.log(spaceSplit.length); 
-	// console.log(spaceSplit[0]); 
-	// console.log(spaceSplit[1]); 
-	// console.log(spaceSplit[2]); 
-	// console.log(spaceSplit[3]); 
 	var r; 
 	var body = ''; 
 	for(r = 0; r < spaceSplit.length; r++){ 
 		var currentElement = spaceSplit[r]; 
 		if(currentElement === ''){ 
 			var currIndex = r; 
-			//var bodyBeginning = currentElement; 
-			// console.log('body'); 
-			// console.log(bodyBeginning); 
-			// console.log(currIndex); 
 			if(spaceSplit[currIndex+1] !== ' '){
 				body = spaceSplit[currIndex+1]; 
-				// console.log('body'); 
-				// console.log(body); 
+				
 			 }
-			//  else { 
-			//  	body = ''; 
-			// // 	body = 'hello'; 
-			// // 	console.log('body'); 
-			// // 	console.log(body); 
-			// }
+		
 		} 
 	}
 	this.headers = headers; 
@@ -135,6 +85,7 @@ function Request(s){
 
 }
 
+//testing the Request Object's properties 
 // var req = new Request(s); 
 
 // console.log("path"); 
@@ -162,10 +113,7 @@ Request.prototype.toString = function(){
 	for(x = 0; x < this.stringKeys.length; x++){ 
 		str = str + this.stringKeys[x] + ' ' + this.values[x] +  '\r\n'; 
 	}
-	// console.log("HEADER STRING"); 
-	// console.log(str); 
-	console.log("THIS BODY"); 
-	console.log(this.body); 
+	
 	var thisBody = this.body; 
 	returnString = returnString + str + '\r\n'; 
 	if(this.body === ''){ 
