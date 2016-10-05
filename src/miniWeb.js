@@ -357,8 +357,32 @@ var server = net.createServer(function(sock){
 		//res.sendFile('/html/test.html'); 
 		//res.sendFile('/img/bmo1.gif'); 
 
-		res.sendFile('/html/test.html'); 
-		res.sendFile('/css/foo.css'); 
+			if(req.path === '/'){ 
+			res.sendFile('/homePage.html'); 
+		} else if(req.path === '/about' || req.path === '/about/'){ 
+			res.sendFile('/about/about.html'); 
+		} else if (req.path === '/lizzie-mcguire.jpg'){ 
+			res.sendFile('/lizzie-mcguire.jpg'); 
+		} else if(req.path === '/css/base.css'){ 
+			res.sendFile('/css/base.css'); 
+		} else if(req.path === '/rando' || req.path === '/rando/' ){ 
+			var randomNum = Math.floor(Math.random() * 3) + 1; 
+			if(randomNum === 1){ 
+				res.sendFile('/rando/image1.jpg'); 
+			} else if (randomNum === 2){ 
+				res.sendFile('/rando/image2.png'); 
+			} else { 
+				res.sendFile('/rando/image3.gif'); 
+			}
+		} else if(req.path === '/home' || req.path === '/home/'){ 
+			res.redirect(301, '/'); 
+		}
+
+
+		else { 
+			res.setHeader('Content-Type', 'text/plain'); 
+			res.send(404, res.codeObject[404]); 
+		}
 
 
 		//NEW  VERSION AFTER CREATED RESPONSE OBJECT 
@@ -557,12 +581,10 @@ Response.prototype.sendFile = function(fileName){
 
 	var contentType; 
 	if(textBased === true){ 
-		console.log("WE MADE IT TO TEXT BASED TRUE"); 
 		contentType = this.headers['Content-Type']; 
 		fs.readFile(filePath, {"encoding": "utf8"}, this.handleRead.bind(this, contentType)); 
 		
 	} else { 
-		console.log("HELLLLLLLLLLLLLLO"); 
 		contentType = this.headers['Content-Type']; 
 		fs.readFile(filePath, {}, this.handleRead.bind(this, contentType)); 
 	}
@@ -570,12 +592,11 @@ Response.prototype.sendFile = function(fileName){
 }
 
 Response.prototype.handleRead = function(contentType, err, data){ 
-	//how do we know that something went wrong, if there is data in the error object? 
-	console.log("THIS IS HTE ERROR"); 
+	
+	console.log("THIS IS THE ERROR"); 
 	console.log(err); 
 	if(err){ 
-		                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    nERROR"); 
-		//var codeMessage = this.codeObject[500]; 
+	
 		this.setHeader('Content-Type', contentType); 
 		//sets status code and body 
 		this.send(500, 'An error has occured!'); 
@@ -586,7 +607,6 @@ Response.prototype.handleRead = function(contentType, err, data){
 		//console.log('RESPONSE TO STRING'); 
 		//console.log(res.toString()); 
 	} else { 
-		console.log("NO ERROR"); 
 		this.setHeader('Content-Type', contentType); 
 		this.writeHead(200); 
 		//this.send(200, this.codeObject[200]); 
@@ -614,19 +634,28 @@ function App(){
 	//when you create a server using net.createServer, it expects a callback function 
 	//to be specified when a client connects to the server 
 	//that method will be a method that i define handleConnection 
-	this.server = net.createServer(this.handleConnection.bind(this)); 
+	var server = net.createServer(this.handleConnection.bind(this)); 
+	this.server = server; 
 	//an object that maps paths to callback functions 
 	var routes = {}; 
+	this.routes = routes; 
 
 }
 
-var App = require('./miniWeb.js').App; 
+//var App = require('./miniWeb.js').App; 
 //var app = new App(); 
 
 //get adds path as a property name in routes, the value of which is the callback function cd 
 App.prototype.get = function(path, cb){ 
 	//cb called when path is requested; what to do when a specific path is asked for 
-	this.routes[path] = cb(req, res); 
+	console.log("PATH"); 
+	console.log(path); 
+	
+	this.routes[path] = cb; 
+
+	console.log("ROUTES"); 
+	console.log(this.routes); 
+
 	// if(path === '/'){ 
 	// 	this.routes[path] = function(req, res){
 	// 		res.send(200, 'image and stylesheet'); 
@@ -651,7 +680,7 @@ App.prototype.get = function(path, cb){
 //port - the port number to bind to 
 //host - the host the server will be running on 
 App.prototype.listen = function(port, host){ 
-	this.server(port, host); 
+	server.listen(port, host); 
 }
 
 
@@ -697,7 +726,7 @@ App.prototype.logResponse = function (req, res){
 	var co = codeObject[c]; 
 	console.log('method', m); 
 	console.log('path', p); 
-	console.log('status code', c; 
+	console.log('status code', c); 
 	console.log('status code message', co); 
 
 

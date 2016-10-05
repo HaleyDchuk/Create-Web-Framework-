@@ -315,10 +315,11 @@ var fs = require('fs');
 var server = net.createServer(function(sock){
 	sock.on('data', function(data){
 		
-
 		var dataString = ''; 
 		dataString = dataString + data; 
 		var req = new Request(dataString); 
+		console.log("SOCK"); 
+		console.log(req.toString(sock)); 
 		var res = new Response(sock); 
 		//CHECKING THE RESPONSE FUNCTIONS 
 		//HOW/WHEN DOES REDIRECT COME INTO PLAY???
@@ -379,6 +380,8 @@ var server = net.createServer(function(sock){
 			} else { 
 				res.sendFile('/rando/image3.gif'); 
 			}
+		} else if(req.path === '/home' || req.path === '/home/'){ 
+			res.redirect(301, '/'); 
 		}
 
 
@@ -522,8 +525,8 @@ Response.prototype.redirect = function(statusCode, url){
 		newVal += url; 
 		this.headers['Location'] = newVal; 
 		str += 'Location: ' + newVal + '\r\n'; 
-		console.log("ENDING STRING"); 
-		console.log(str); 
+		//console.log("ENDING STRING"); 
+		//console.log(str); 
 		this.end(str); 
 } else { 
 	var status = 301; 
